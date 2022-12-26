@@ -1,7 +1,7 @@
 package data
 
 import (
-	"greenlight.alexedwards.net/internal/validator"
+	"greenlight.dinara.net/internal/validator"
 	"time"
 )
 
