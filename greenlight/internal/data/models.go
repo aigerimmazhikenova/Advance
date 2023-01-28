@@ -3,29 +3,33 @@ package data
 import (
 	"errors"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"net/http"
 )
 
 var (
+	ErrEditConflict = errors.New("edit conflict")
+
 	ErrRecordNotFound = errors.New("record not found")
-	ErrEditConflict   = errors.New("edit conflict")
 )
 
 type Models struct {
 	Movies interface {
-		Insert(movie *Movie) error
-		Get(id int64) (*Movie, error)
-		Update(movie *Movie) error
-		Delete(id int64) error
+		Insert(movie *Movie, r *http.Request) error
+		Get(id int64, r *http.Request) (*Movie, error)
+		Update(movie *Movie, r *http.Request) error
+		Delete(id int64, r *http.Request) error
+		GetAll(title string, genres []string, filters Filters, r *http.Request) ([]*Movie, Metadata, error)
+	}
+	Users interface {
+		Insert(user *User) error
+		GetByEmail(email string) (*User, error)
+		Update(user *User) error
 	}
 }
 
-func NewModels(db *pgxpool.Pool) Models {
+func NewModels(pool *pgxpool.Pool) Models {
 	return Models{
-		Movies: MovieModel{DB: db},
-	}
-}
-func NewMockModels() Models {
-	return Models{
-		Movies: MockMovieModel{},
+		Movies: MovieModel{pool: pool},
+		Users:  UserModel{pool: pool},
 	}
 }
